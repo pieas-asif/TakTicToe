@@ -29,6 +29,7 @@ class _HomeState extends State<Home> {
   bool oTurn = true; // the first player in O
   int oWins = 0;
   int xWins = 0;
+  int _moves = 0;
   List<IconData?> _marker = [
     null,
     null,
@@ -56,45 +57,42 @@ class _HomeState extends State<Home> {
   }
 
   void _checkWinCondition() {
+    _moves += 1;
+
     if (_marker[0] == _marker[1] &&
         _marker[1] == _marker[2] &&
         _marker[2] != null) {
       _showWinnerDialog(_marker[0]!);
-    }
-    if (_marker[3] == _marker[4] &&
+    } else if (_marker[3] == _marker[4] &&
         _marker[4] == _marker[5] &&
         _marker[5] != null) {
       _showWinnerDialog(_marker[3]!);
-    }
-    if (_marker[6] == _marker[7] &&
+    } else if (_marker[6] == _marker[7] &&
         _marker[7] == _marker[8] &&
         _marker[8] != null) {
       _showWinnerDialog(_marker[6]!);
-    }
-    if (_marker[0] == _marker[3] &&
+    } else if (_marker[0] == _marker[3] &&
         _marker[3] == _marker[6] &&
         _marker[6] != null) {
       _showWinnerDialog(_marker[0]!);
-    }
-    if (_marker[1] == _marker[4] &&
+    } else if (_marker[1] == _marker[4] &&
         _marker[4] == _marker[7] &&
         _marker[7] != null) {
       _showWinnerDialog(_marker[1]!);
-    }
-    if (_marker[2] == _marker[5] &&
+    } else if (_marker[2] == _marker[5] &&
         _marker[5] == _marker[8] &&
         _marker[8] != null) {
       _showWinnerDialog(_marker[2]!);
-    }
-    if (_marker[0] == _marker[4] &&
+    } else if (_marker[0] == _marker[4] &&
         _marker[4] == _marker[8] &&
         _marker[8] != null) {
       _showWinnerDialog(_marker[0]!);
-    }
-    if (_marker[2] == _marker[4] &&
+    } else if (_marker[2] == _marker[4] &&
         _marker[4] == _marker[6] &&
         _marker[6] != null) {
       _showWinnerDialog(_marker[2]!);
+    } else if (_moves >= 9) {
+      _showDrawDialog();
     }
   }
 
@@ -130,6 +128,9 @@ class _HomeState extends State<Home> {
                         _marker[i] = null;
                       });
                     }
+                    setState(() {
+                      _moves = 0;
+                    });
                     Navigator.pop(context);
                   },
                   child: Text("PLAY AGAIN"),
@@ -140,6 +141,47 @@ class _HomeState extends State<Home> {
             ),
           );
         });
+  }
+
+  void _showDrawDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              Text(
+                "MATCH",
+                style: TextStyle(
+                  fontSize: 32,
+                ),
+              ),
+              Text("DRAW"),
+              SizedBox(
+                height: 20,
+              ),
+              MaterialButton(
+                onPressed: () {
+                  for (int i = 0; i < _marker.length; i++) {
+                    setState(() {
+                      _marker[i] = null;
+                    });
+                  }
+                  setState(() {
+                    _moves = 0;
+                  });
+                  Navigator.pop(context);
+                },
+                child: Text("PLAY AGAIN"),
+                color: Colors.grey.shade200,
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -206,7 +248,13 @@ class _HomeState extends State<Home> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade700),
+                            border: Border.all(
+                                color: _marker[index] == null
+                                    ? Colors.grey.shade700
+                                    : Colors.grey.shade600),
+                            color: _marker[index] == null
+                                ? Colors.transparent
+                                : Colors.grey.shade700,
                           ),
                           child: Center(
                             child: _marker[index] != null
@@ -226,23 +274,24 @@ class _HomeState extends State<Home> {
                     }),
               ),
               Expanded(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    oTurn ? Icons.circle_outlined : Icons.clear,
-                    size: 50,
-                    color: Colors.white,
-                  ),
-                  Text(
-                    "'S TURN",
-                    style: TextStyle(
-                      fontSize: 24,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      oTurn ? Icons.circle_outlined : Icons.clear,
+                      size: 50,
                       color: Colors.white,
                     ),
-                  ),
-                ],
-              )),
+                    Text(
+                      "'S TURN",
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
