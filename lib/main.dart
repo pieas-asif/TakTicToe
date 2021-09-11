@@ -4,6 +4,18 @@ void main() {
   runApp(MyApp());
 }
 
+class TakTicFont {
+  TakTicFont._();
+
+  static const _kFontFam = 'TakTicFont';
+  static const String? _kFontPkg = null;
+
+  static const IconData cancel =
+      IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData circle_empty =
+      IconData(0xf10c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+}
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -11,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Tak Tic Toe',
       theme: ThemeData(
-        primarySwatch: Colors.grey,
+        primarySwatch: Colors.deepOrange,
       ),
       home: Home(),
     );
@@ -46,9 +58,9 @@ class _HomeState extends State<Home> {
     if (_marker[index] == null) {
       setState(() {
         if (oTurn) {
-          _marker[index] = Icons.circle_outlined;
+          _marker[index] = TakTicFont.circle_empty;
         } else {
-          _marker[index] = Icons.clear;
+          _marker[index] = TakTicFont.cancel;
         }
         oTurn = !oTurn;
         _checkWinCondition();
@@ -97,7 +109,7 @@ class _HomeState extends State<Home> {
   }
 
   void _showWinnerDialog(IconData winner) {
-    if (winner == Icons.clear) {
+    if (winner == TakTicFont.cancel) {
       setState(() {
         xWins += 1;
       });
@@ -133,8 +145,8 @@ class _HomeState extends State<Home> {
                     });
                     Navigator.pop(context);
                   },
-                  child: Text("PLAY AGAIN"),
-                  color: Colors.grey.shade200,
+                  child: Text("PLAY AGAIN", style: TextStyle(color: Colors.white,),),
+                  color: Color(0xFFe43a15),
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
                 ),
               ],
@@ -187,7 +199,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade800,
+      backgroundColor: Color(0xFFe43a15),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -200,8 +212,9 @@ class _HomeState extends State<Home> {
                     Text(
                       "SCOREBOARD",
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 22,
                         color: Colors.white,
+                        fontWeight: FontWeight.w300,
                       ),
                     ),
                     Row(
@@ -212,49 +225,70 @@ class _HomeState extends State<Home> {
                           "CIRCLE " + oWins.toString(),
                           style: TextStyle(
                             fontSize: 24,
-                            color: oWins == xWins
-                                ? Colors.grey
-                                : xWins > oWins
-                                    ? Colors.red
-                                    : Colors.green,
+                            color: Colors.white,
+                            fontWeight: oWins > xWins ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
                         Text(
                           "CROSS " + xWins.toString(),
                           style: TextStyle(
                             fontSize: 24,
-                            color: oWins == xWins
-                                ? Colors.grey
-                                : oWins > xWins
-                                    ? Colors.red
-                                    : Colors.green,
+                            color:Colors.white,
+                            fontWeight: xWins > oWins ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
                       ],
                     ),
+                    SizedBox(),
                   ],
                 ),
               ),
               Expanded(
                 flex: 3,
                 child: GridView.builder(
+                    physics: NeverScrollableScrollPhysics(),
                     itemCount: 9,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3),
                     itemBuilder: (BuildContext context, int index) {
+                      Border? border;
+                      bool topRow = false;
+                      bool bottomRow = false;
+                      bool leftCol = false;
+                      bool rightCol = false;
+                      if (index == 0 || index == 1 || index == 2) {
+                        topRow = true;
+                      }
+                      if (index == 0 || index == 3 || index == 6) {
+                        leftCol = true;
+                      }
+                      if (index == 6 || index == 7 || index == 8) {
+                        bottomRow = true;
+                      }
+                      if (index == 2 || index == 5 || index == 8) {
+                        rightCol = true;
+                      }
+                      border = Border(
+                        top: topRow
+                            ? BorderSide.none
+                            : BorderSide(width: 2.0, color: Colors.white),
+                        left: leftCol
+                            ? BorderSide.none
+                            : BorderSide(width: 2.0, color: Colors.white),
+                        right: rightCol
+                            ? BorderSide.none
+                            : BorderSide(width: 2.0, color: Colors.white),
+                        bottom: bottomRow
+                            ? BorderSide.none
+                            : BorderSide(width: 2.0, color: Colors.white),
+                      );
                       return GestureDetector(
                         onTap: () {
                           _setMark(index);
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            border: Border.all(
-                                color: _marker[index] == null
-                                    ? Colors.grey.shade700
-                                    : Colors.grey.shade600),
-                            color: _marker[index] == null
-                                ? Colors.transparent
-                                : Colors.grey.shade700,
+                            border: border,
                           ),
                           child: Center(
                             child: _marker[index] != null
@@ -278,7 +312,7 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      oTurn ? Icons.circle_outlined : Icons.clear,
+                      oTurn ? TakTicFont.circle_empty : TakTicFont.cancel,
                       size: 50,
                       color: Colors.white,
                     ),
